@@ -109,13 +109,13 @@ export function HomePage() {
 
       <div className="relative space-y-7 px-4 pb-28 pt-6">
         <header className="space-y-2">
-          <div className="text-center">
-            <div className="inline-flex items-baseline gap-1.5">
-              <span className="text-[clamp(28px,7vw,42px)] font-semibold tracking-[0.18em] text-white">
-                CMDLY
-              </span>
-              <span className="text-[clamp(18px,5vw,26px)] font-light tracking-tight text-white/70">.</span>
-            </div>
+          <div className="flex items-center justify-center">
+            <img
+              src="/cmdly-logo.png"
+              alt="Cmdly"
+              className="h-20 w-auto select-none sm:h-24"
+              draggable={false}
+            />
           </div>
           <motion.h1
             initial={{ opacity: 0, y: 8 }}
