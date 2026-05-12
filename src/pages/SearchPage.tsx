@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { CommandRow } from "../components/CommandRow";
-import { ALL_COMMANDS } from "../data/commands";
+import { useCommands } from "../context/CommandsContext";
+import { useHistory } from "../context/HistoryContext";
 import { PLATFORMS } from "../data/platforms";
 import type { Command, PlatformId } from "../types";
 
@@ -55,13 +56,26 @@ export function SearchPage() {
   const [q, setQ] = useState(initial);
   const [platform, setPlatform] = useState<PlatformId | "all">("all");
 
+  const { commands } = useCommands();
+  const { queries: recentQueries, pushQuery, removeQuery, clearQueries } = useHistory();
+
   const results = useMemo(() => {
     const needle = q.trim();
-    const ranked = ALL_COMMANDS.map((c) => ({ c, sc: score(c, needle) }))
+    const ranked = commands
+      .map((c) => ({ c, sc: score(c, needle) }))
       .filter(({ c, sc }) => (platform === "all" ? true : c.platform === platform) && (needle ? sc > 0 : true))
       .sort((a, b) => b.sc - a.sc || (b.c.weight ?? 1) - (a.c.weight ?? 1));
     return ranked.map((r) => r.c);
-  }, [q, platform]);
+  }, [q, platform, commands]);
+
+  useEffect(() => {
+    const needle = q.trim();
+    if (needle.length < 2) return;
+    const t = window.setTimeout(() => pushQuery(needle), 700);
+    return () => window.clearTimeout(t);
+  }, [q, pushQuery]);
+
+  const showRecents = q.trim().length === 0 && recentQueries.length > 0;
 
   return (
     <div className="min-h-0 flex-1 px-4 pb-28 pt-[calc(0.75rem+env(safe-area-inset-top))]">
@@ -79,11 +93,61 @@ export function SearchPage() {
               setQ(v);
               setParams(v.trim() ? { q: v } : {});
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const needle = q.trim();
+                if (needle) pushQuery(needle);
+              }
+            }}
             placeholder="Filter instantly…"
             className="w-full rounded-xl bg-transparent px-3 py-3 text-sm text-vault-fg outline-none placeholder:text-vault-subtle"
             aria-label="Search query"
           />
         </div>
+
+        {showRecents ? (
+          <section className="space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <h2 className="text-[11px] font-semibold uppercase tracking-wider text-vault-muted">Recent searches</h2>
+              <button
+                type="button"
+                onClick={clearQueries}
+                className="text-[11px] font-semibold text-vault-subtle hover:text-vault-fg"
+              >
+                Clear
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {recentQueries.map((rq) => (
+                <span
+                  key={rq}
+                  className="group flex items-center gap-1 rounded-full bg-vault-pill-bg ring-1 ring-vault-border"
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQ(rq);
+                      setParams({ q: rq });
+                    }}
+                    className="rounded-full py-1.5 pl-3 pr-1 text-xs font-semibold text-vault-fg hover:bg-vault-muted/15"
+                  >
+                    {rq}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeQuery(rq)}
+                    aria-label={`Remove ${rq} from history`}
+                    className="rounded-full p-1 pr-2 text-vault-subtle hover:text-vault-fg"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                </span>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <div className="flex flex-wrap gap-2">
           {PLATFORM_FILTERS.map((p) => (
@@ -93,9 +157,17 @@ export function SearchPage() {
               onClick={() => setPlatform(p)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-vault-border transition ${
                 platform === p
-                  ? "bg-vault-muted/30 text-vault-fg shadow-sm"
+                  ? "text-vault-fg shadow-sm"
                   : "bg-vault-pill-bg text-vault-muted hover:bg-vault-scrim"
               }`}
+              style={
+                platform === p
+                  ? {
+                      backgroundColor: "rgb(var(--accent) / 0.22)",
+                      boxShadow: "0 0 0 1px rgb(var(--accent) / 0.35) inset",
+                    }
+                  : undefined
+              }
             >
               {p === "all" ? "All" : PLATFORMS.find((x) => x.id === p)?.label ?? p}
             </button>

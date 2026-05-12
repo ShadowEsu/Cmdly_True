@@ -1,52 +1,46 @@
-import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { PLATFORMS } from "../data/platforms";
-import { ALL_COMMANDS } from "../data/commands";
+import { useCommands } from "../context/CommandsContext";
 
 export function PlatformRail() {
   const nav = useNavigate();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const { commands } = useCommands();
+
+  const counts = new Map<string, number>();
+  for (const c of commands) counts.set(c.platform, (counts.get(c.platform) ?? 0) + 1);
 
   return (
     <div className="space-y-3">
       <div className="flex items-end justify-between px-1">
         <div>
           <h2 className="text-base font-semibold tracking-wide text-vault-fg">Platforms</h2>
-          <p className="text-sm text-vault-muted">Swipe — each deck is themed.</p>
+          <p className="text-sm text-vault-muted">Tap a deck to browse its commands.</p>
         </div>
       </div>
-      <div ref={scrollRef} className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-1 pt-1">
+      <div className="-mx-1 flex gap-2.5 overflow-x-auto px-1 pb-1 pt-1">
         {PLATFORMS.map((p, i) => {
-          const count = ALL_COMMANDS.filter((c) => c.platform === p.id).length;
+          const count = counts.get(p.id) ?? 0;
           return (
             <motion.button
               key={p.id}
               type="button"
-              initial={{ opacity: 0, x: 16 }}
+              initial={{ opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.05 * i, type: "spring", stiffness: 380, damping: 26 }}
-              whileTap={{ scale: 0.98 }}
+              transition={{ delay: 0.03 * i, type: "spring", stiffness: 400, damping: 28 }}
+              whileTap={{ scale: 0.96 }}
               onClick={() => nav(`/platform/${p.id}`)}
-              className={`snap-start shrink-0 w-[min(78vw,280px)] rounded-3xl border border-vault-border bg-gradient-to-br ${p.gradient} p-[1px] shadow-[0_16px_50px_rgba(0,0,0,0.12)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.45)]`}
-              aria-label={`Open ${p.label} commands`}
+              className={`shrink-0 w-[136px] rounded-2xl border border-vault-border bg-gradient-to-br ${p.gradient} p-[1px]`}
+              aria-label={`Open ${p.label} commands (${count})`}
             >
-              <div className="rounded-[22px] bg-vault-elevated/95 p-4 backdrop-blur-md dark:bg-black/35">
-                <div className="flex items-start justify-between gap-3">
-                  <span className="rounded-full bg-vault-pill-bg px-2.5 py-1 text-[11px] font-semibold ring-1 ring-vault-border dark:bg-black/30 dark:text-white/80">
-                    {count} cmds
-                  </span>
-                </div>
-                <div className="mt-4 space-y-1">
-                  <div className="text-lg font-semibold tracking-tight text-vault-fg">{p.label}</div>
-                  <p className="line-clamp-2 text-sm leading-relaxed text-vault-muted">{p.tagline}</p>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-vault-muted">Open library</span>
-                  <span className="text-vault-subtle" aria-hidden>
-                    →
-                  </span>
-                </div>
+              <div className="h-full rounded-[14px] bg-vault-elevated/95 p-3 backdrop-blur-md dark:bg-black/35">
+                <div
+                  className="mb-2 inline-block h-2 w-2 rounded-full"
+                  style={{ backgroundColor: p.accent }}
+                  aria-hidden
+                />
+                <div className="text-sm font-semibold text-vault-fg">{p.label}</div>
+                <div className="mt-1 text-[11px] text-vault-muted">{count} commands</div>
               </div>
             </motion.button>
           );

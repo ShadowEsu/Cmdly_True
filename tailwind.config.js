@@ -5,8 +5,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Crimson Pro", "system-ui", "serif"],
+        sans: ["JetBrains Mono", "ui-monospace", "monospace"],
         mono: ["JetBrains Mono", "ui-monospace", "monospace"],
+        display: ["Crimson Pro", "system-ui", "serif"],
       },
       colors: {
         vault: {

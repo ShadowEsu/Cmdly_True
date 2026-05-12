@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── User-controlled tokens (set from SettingsContext) ────────────────────── */
+:root {
+  --font-scale: 1;
+  --accent: 139 92 246;
+  --accent-soft: 139 92 246;
+}
+
+html {
+  font-size: calc(16px * var(--font-scale));
+}
+
 /* ── Light (default when .dark is absent) ─────────────────────────────────── */
 :root {
   color-scheme: light dark;
@@ -57,8 +68,8 @@ body {
   transition-property: color, background-color;
   transition-duration: 200ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: "Crimson Pro", system-ui, serif;
-  font-weight: 300;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-weight: 400;
 }
 
 /* Scrollbars adapt to scheme */

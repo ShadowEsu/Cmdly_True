@@ -1,0 +1,6 @@
+{
+  "$schema": "Cmdly hot-update bundle. Loaded on app start. Replace this file on your CDN (or in public/ before build) with a higher `version` number to push new commands to all installed clients without an app store release. The app uses the bundled fallback in src/data/commands.ts on first launch and falls back to it offline. `version` must be a number greater than BUNDLED_BUNDLE_VERSION in src/context/CommandsContext.tsx for the remote bundle to be applied.",
+  "version": 1,
+  "generatedAt": "2026-05-12T00:00:00Z",
+  "commands": []
+}

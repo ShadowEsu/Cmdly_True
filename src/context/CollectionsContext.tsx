@@ -5,6 +5,9 @@ type Ctx = {
   savedIds: Set<string>;
   toggleSave: (cmd: Command) => void;
   isSaved: (id: string) => boolean;
+  replaceSaves: (ids: Iterable<string>) => void;
+  mergeSaves: (ids: Iterable<string>) => void;
+  clearSaves: () => void;
 };
 
 const CollectionsContext = createContext<Ctx | null>(null);
@@ -42,7 +45,26 @@ export function CollectionsProvider({ children }: { children: ReactNode }) {
 
   const isSaved = useCallback((id: string) => savedIds.has(id), [savedIds]);
 
-  const value = useMemo(() => ({ savedIds, toggleSave, isSaved }), [savedIds, toggleSave, isSaved]);
+  const replaceSaves = useCallback((ids: Iterable<string>) => {
+    const next = new Set<string>();
+    for (const id of ids) if (typeof id === "string" && id.length > 0 && id.length <= 200) next.add(id);
+    setSavedIds(next);
+  }, []);
+
+  const mergeSaves = useCallback((ids: Iterable<string>) => {
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      for (const id of ids) if (typeof id === "string" && id.length > 0 && id.length <= 200) next.add(id);
+      return next;
+    });
+  }, []);
+
+  const clearSaves = useCallback(() => setSavedIds(new Set()), []);
+
+  const value = useMemo(
+    () => ({ savedIds, toggleSave, isSaved, replaceSaves, mergeSaves, clearSaves }),
+    [savedIds, toggleSave, isSaved, replaceSaves, mergeSaves, clearSaves],
+  );
 
   return <CollectionsContext.Provider value={value}>{children}</CollectionsContext.Provider>;
 }

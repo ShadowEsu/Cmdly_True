@@ -3,6 +3,8 @@
 Three formats: **30s Reel**, **60s Demo**, **15s Hook**.
 Each scene specifies the exact app snapshot to capture and how to stage it.
 
+**Positioning (stay accurate):** Voiceover and captions should only describe **saving** entries and **searching** your vault. Do not imply remote storage layers, outbound network features, or cloud inference as part of how Cmdly works on-device.
+
 ---
 
 ## Snapshot Capture Guide
@@ -16,7 +18,7 @@ Use iPhone 15 Pro frame (393×852 pt) — tall enough to show cards without crow
 | `S2` | Home — stat chips + platform rail | Scroll just past the constellation so the three stat chips and coloured platform pills are visible. |
 | `S3` | Home — Featured picks scroll | Scroll to "Featured picks" row. Show 2.5 cards (third card cropped = scroll invitation). |
 | `S4` | Search — empty state | Search bar focused, keyboard dismissed, filter pills across the top. |
-| `S5` | Search — live query "git" | Type "git" — results list populating. Cursor/ChatGPT cards visible. |
+| `S5` | Search — live query "git" | Type "git" — results list populating. Two or more platform cards visible. |
 | `S6` | Platform / Claude | Open Claude deck. Burnt-orange gradient header (`from-[#4a2618]`). Several command rows visible. |
 | `S7` | Platform / Gemini | Open Gemini deck. Deep-blue gradient header. |
 | `S8` | Platform / Lovable | Open Lovable deck. Hot-pink gradient header. |
@@ -39,7 +41,7 @@ Record short **2–4 second screen recordings** of S1 (constellation drift), S5 
   "Hello, Coder!" appears with spring motion.
   
   CAPTION (bold white, centred):
-  "Every AI shortcut. One app."
+  "Every shortcut. One app."
 ```
 
 ```
@@ -56,7 +58,7 @@ Record short **2–4 second screen recordings** of S1 (constellation drift), S5 
   Platform rail slides in.  Coloured pills: orange, green, slate, blue, pink…
   
   CAPTION:
-  "10 AI platforms. All in one vault."
+  "10 platforms. All in one vault."
 ```
 
 ```
@@ -138,7 +140,7 @@ Record short **2–4 second screen recordings** of S1 (constellation drift), S5 
   Platform pills glow below.
   
   VOICEOVER:
-  "Cmdly is the command vault for every AI tool you use."
+  "Cmdly is the command vault for every tool you use."
 ```
 
 ```
@@ -198,7 +200,7 @@ Record short **2–4 second screen recordings** of S1 (constellation drift), S5 
   Logo "CMDLY." pulses in, then full-screen title card.
   
   VOICEOVER:
-  "Cmdly — the command vault for the AI era."
+  "Cmdly — your command vault, saved and searchable."
   
   CAPTION:
   "CMDLY — Free on the App Store"
@@ -217,7 +219,7 @@ Record short **2–4 second screen recordings** of S1 (constellation drift), S5 
 ```
 [0:00 – 0:02]  Black screen
   White text fades in:
-  "How many AI commands do you actually know?"
+  "How many commands do you actually know?"
 ```
 
 ```

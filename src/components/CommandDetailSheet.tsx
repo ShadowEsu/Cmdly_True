@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Command } from "../types";
 import { platformById } from "../data/platforms";
 import { useCollections } from "../context/CollectionsContext";
+import { useHistory } from "../context/HistoryContext";
+import { useSettings } from "../context/SettingsContext";
 import { CopyIcon } from "./CopyIcon";
 
 interface CommandDetailSheetProps {
@@ -12,15 +14,21 @@ interface CommandDetailSheetProps {
 
 export function CommandDetailSheet({ cmd, onClose }: CommandDetailSheetProps) {
   const { toggleSave, isSaved } = useCollections();
+  const { pushView } = useHistory();
+  const { vibrate } = useSettings();
   const [copied, setCopied] = useState(false);
 
   const p = cmd ? platformById(cmd.platform) : null;
   const saved = cmd ? isSaved(cmd.id) : false;
 
+  useEffect(() => {
+    if (cmd?.id) pushView(cmd.id);
+  }, [cmd?.id, pushView]);
+
   async function copyText(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      if ("vibrate" in navigator) navigator.vibrate(12);
+      vibrate(12);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -88,12 +96,22 @@ export function CommandDetailSheet({ cmd, onClose }: CommandDetailSheetProps) {
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                onClick={() => toggleSave(cmd)}
+                onClick={() => {
+                  vibrate(10);
+                  toggleSave(cmd);
+                }}
                 className={`flex h-11 items-center justify-center gap-2 rounded-xl text-sm font-semibold transition active:scale-[0.98] ${
-                  saved
-                    ? "bg-violet-500/20 text-violet-100 ring-1 ring-violet-400/30"
-                    : "bg-vault-pill-bg text-vault-fg ring-1 ring-vault-border"
+                  saved ? "" : "bg-vault-pill-bg text-vault-fg ring-1 ring-vault-border"
                 }`}
+                style={
+                  saved
+                    ? {
+                        backgroundColor: "rgb(var(--accent) / 0.22)",
+                        color: "rgb(var(--accent))",
+                        boxShadow: "0 0 0 1px rgb(var(--accent) / 0.35) inset",
+                      }
+                    : undefined
+                }
               >
                 <svg
                   width="18"

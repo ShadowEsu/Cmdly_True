@@ -6,7 +6,8 @@ export function GlowSearch({ autoFocus = false }: { autoFocus?: boolean }) {
   const [q, setQ] = useState("");
   const [focus, setFocus] = useState(false);
   const nav = useNavigate();
-  const ring = "focus-within:shadow-[0_0_0_1px_rgba(139,92,246,0.35),0_0_40px_rgba(139,92,246,0.12)]";
+  const ring =
+    "focus-within:shadow-[0_0_0_1px_rgb(var(--accent)/0.4),0_0_40px_rgb(var(--accent)/0.18)]";
 
   return (
     <motion.div

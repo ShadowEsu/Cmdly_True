@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 const PREFS_KEY = "ai-command-vault:prefs";
 
@@ -15,9 +23,36 @@ type Prefs = {
 
 const defaults: Prefs = {
   theme: "dark",
-  fontSize: "lg",
+  fontSize: "md",
   haptics: true,
   accent: "violet",
+};
+
+const FONT_SIZES: ReadonlySet<FontSize> = new Set<FontSize>(["sm", "md", "lg"]);
+const ACCENTS: ReadonlySet<Accent> = new Set<Accent>(["violet", "cyan", "amber"]);
+
+const FONT_SCALE: Record<FontSize, number> = {
+  sm: 0.9,
+  md: 1,
+  lg: 1.12,
+};
+
+const ACCENT_RGB: Record<Accent, string> = {
+  violet: "139 92 246",
+  cyan: "34 211 238",
+  amber: "251 191 36",
+};
+
+const ACCENT_SOFT_RGB: Record<Accent, string> = {
+  violet: "139 92 246",
+  cyan: "34 211 238",
+  amber: "251 191 36",
+};
+
+export const accentRing: Record<Accent, string> = {
+  violet: "rgba(139, 92, 246, 0.45)",
+  cyan: "rgba(34, 211, 238, 0.45)",
+  amber: "rgba(251, 191, 36, 0.45)",
 };
 
 function loadPrefs(): Prefs {
@@ -27,56 +62,43 @@ function loadPrefs(): Prefs {
     if (!raw) return defaults;
     const parsed = JSON.parse(raw) as Partial<Prefs>;
     return {
-      ...defaults,
-      ...parsed,
-      // Theme is locked to dark mode.
       theme: "dark",
+      fontSize: FONT_SIZES.has(parsed.fontSize as FontSize) ? (parsed.fontSize as FontSize) : defaults.fontSize,
+      haptics: typeof parsed.haptics === "boolean" ? parsed.haptics : defaults.haptics,
+      accent: ACCENTS.has(parsed.accent as Accent) ? (parsed.accent as Accent) : defaults.accent,
     };
   } catch {
     return defaults;
   }
 }
 
-function applyDocumentTheme(mode: ThemeMode, systemDark: boolean) {
-  void mode;
-  void systemDark;
-  document.documentElement.classList.add("dark");
-  document.documentElement.style.colorScheme = "dark";
+function applyDocumentTokens(prefs: Prefs) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  root.classList.add("dark");
+  root.style.colorScheme = "dark";
+  root.style.setProperty("--font-scale", String(FONT_SCALE[prefs.fontSize]));
+  root.style.setProperty("--accent", ACCENT_RGB[prefs.accent]);
+  root.style.setProperty("--accent-soft", ACCENT_SOFT_RGB[prefs.accent]);
 }
 
 type Ctx = Prefs & {
-  /** Resolved scheme after applying System preference */
   resolvedTheme: Exclude<ThemeMode, "system">;
   setTheme: (v: ThemeMode) => void;
   setFontSize: (v: FontSize) => void;
   setHaptics: (v: boolean) => void;
   setAccent: (v: Accent) => void;
+  vibrate: (pattern?: number | number[]) => void;
 };
 
 const Ctx = createContext<Ctx | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [prefs, setPrefs] = useState<Prefs>(() => loadPrefs());
-  const [systemPrefersDark, setSystemPrefersDark] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-  });
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => setSystemPrefersDark(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  const resolvedTheme = useMemo((): Exclude<ThemeMode, "system"> => {
-    void systemPrefersDark;
-    return "dark";
-  }, [systemPrefersDark]);
-
-  useEffect(() => {
-    applyDocumentTheme(prefs.theme, systemPrefersDark);
-  }, [prefs.theme, systemPrefersDark]);
+    applyDocumentTokens(prefs);
+  }, [prefs]);
 
   useEffect(() => {
     try {
@@ -87,28 +109,46 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }, [prefs]);
 
   const setTheme = useCallback((theme: ThemeMode) => {
-    // Theme is locked to dark mode.
     void theme;
     setPrefs((p) => ({ ...p, theme: "dark" }));
-    applyDocumentTheme("dark", true);
   }, []);
 
-  const setFontSize = useCallback((fontSize: FontSize) => setPrefs((p) => ({ ...p, fontSize })), []);
+  const setFontSize = useCallback((fontSize: FontSize) => {
+    if (!FONT_SIZES.has(fontSize)) return;
+    setPrefs((p) => ({ ...p, fontSize }));
+  }, []);
 
   const setHaptics = useCallback((haptics: boolean) => setPrefs((p) => ({ ...p, haptics })), []);
 
-  const setAccent = useCallback((accent: Accent) => setPrefs((p) => ({ ...p, accent })), []);
+  const setAccent = useCallback((accent: Accent) => {
+    if (!ACCENTS.has(accent)) return;
+    setPrefs((p) => ({ ...p, accent }));
+  }, []);
+
+  const vibrate = useCallback(
+    (pattern: number | number[] = 12) => {
+      if (!prefs.haptics) return;
+      if (typeof navigator === "undefined" || !("vibrate" in navigator)) return;
+      try {
+        navigator.vibrate(pattern);
+      } catch {
+        /* ignore */
+      }
+    },
+    [prefs.haptics],
+  );
 
   const value = useMemo(
     () => ({
       ...prefs,
-      resolvedTheme,
+      resolvedTheme: "dark" as const,
       setTheme,
       setFontSize,
       setHaptics,
       setAccent,
+      vibrate,
     }),
-    [prefs, resolvedTheme, setTheme, setFontSize, setHaptics, setAccent],
+    [prefs, setTheme, setFontSize, setHaptics, setAccent, vibrate],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -119,9 +159,3 @@ export function useSettings() {
   if (!v) throw new Error("useSettings must be used within SettingsProvider");
   return v;
 }
-
-export const accentRing: Record<Accent, string> = {
-  violet: "rgba(139, 92, 246, 0.45)",
-  cyan: "rgba(34, 211, 238, 0.45)",
-  amber: "rgba(251, 191, 36, 0.45)",
-};

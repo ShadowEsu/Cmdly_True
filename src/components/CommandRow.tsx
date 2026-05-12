@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import type { Command } from "../types";
 import { platformById } from "../data/platforms";
 import { useCollections } from "../context/CollectionsContext";
+import { useSettings } from "../context/SettingsContext";
 import { CopyIcon } from "./CopyIcon";
 import { CommandDetailSheet } from "./CommandDetailSheet";
 
@@ -30,6 +31,7 @@ function BookmarkIcon({ filled, className, size = 20 }: { filled: boolean; class
 export function CommandRow({ cmd, index = 0 }: { cmd: Command; index?: number }) {
   const [showSheet, setShowSheet] = useState(false);
   const { toggleSave, isSaved } = useCollections();
+  const { vibrate } = useSettings();
   const p = platformById(cmd.platform);
   const saved = isSaved(cmd.id);
 
@@ -38,7 +40,7 @@ export function CommandRow({ cmd, index = 0 }: { cmd: Command; index?: number })
   async function copyText(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      if ("vibrate" in navigator) navigator.vibrate(12);
+      vibrate(12);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -85,13 +87,21 @@ export function CommandRow({ cmd, index = 0 }: { cmd: Command; index?: number })
         <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
-            className={`grid h-11 w-11 place-items-center rounded-xl ring-1 ring-vault-border transition active:scale-[0.96] ${
-              saved
-                ? "bg-violet-500/15 text-violet-800 ring-violet-400/35 dark:bg-violet-500/20 dark:text-violet-100 dark:ring-violet-400/30"
-                : "bg-vault-pill-bg text-vault-fg hover:bg-vault-muted/15 dark:hover:bg-white/10"
+            className={`grid h-11 w-11 place-items-center rounded-xl transition active:scale-[0.96] ${
+              saved ? "" : "bg-vault-pill-bg text-vault-fg ring-1 ring-vault-border hover:bg-vault-muted/15 dark:hover:bg-white/10"
             }`}
+            style={
+              saved
+                ? {
+                    backgroundColor: "rgb(var(--accent) / 0.18)",
+                    color: "rgb(var(--accent))",
+                    boxShadow: "0 0 0 1px rgb(var(--accent) / 0.35) inset",
+                  }
+                : undefined
+            }
             onClick={(e) => {
               e.stopPropagation();
+              vibrate(10);
               toggleSave(cmd);
             }}
             aria-label={saved ? `Unsave ${cmd.name}` : `Save ${cmd.name}`}
