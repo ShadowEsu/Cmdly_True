@@ -1,7 +1,13 @@
 import { useRef, useState, type CSSProperties } from "react";
+import { Link } from "react-router-dom";
 import { useSettings, type Accent, type FontSize } from "../context/SettingsContext";
 import { useCollections } from "../context/CollectionsContext";
 import { buildBackup, downloadBackupFile, parseBackup } from "../lib/backup";
+
+const APP_VERSION = "0.1.0";
+
+const DISCLAIMER =
+  "Cmdly is an independent reference tool. It is not affiliated with, endorsed by, or sponsored by Anthropic, OpenAI, Google, GitHub, Perplexity, Mistral, DeepSeek, xAI, Lovable, or any other platform listed in the app.";
 
 type ImportMode = "merge" | "replace";
 
@@ -299,9 +305,37 @@ export function SettingsPage() {
           ) : null}
         </section>
 
-        <p className="text-xs text-vault-subtle">
-          Reference data is illustrative—always confirm shortcuts against each vendor&apos;s current documentation.
-        </p>
+        <section className="rounded-2xl border border-vault-border bg-vault-surface p-4 backdrop-blur-xl">
+          <h2 className="text-sm font-semibold text-vault-fg">About</h2>
+          <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 text-xs">
+            <dt className="text-vault-muted">App</dt>
+            <dd className="text-vault-fg">Cmdly</dd>
+            <dt className="text-vault-muted">Version</dt>
+            <dd className="text-vault-fg">{APP_VERSION}</dd>
+            <dt className="text-vault-muted">License</dt>
+            <dd className="text-vault-fg">MIT</dd>
+            <dt className="text-vault-muted">Privacy</dt>
+            <dd>
+              <Link to="/privacy" className="text-vault-fg underline-offset-4 hover:underline">
+                Privacy policy
+              </Link>
+            </dd>
+            <dt className="text-vault-muted">Contact</dt>
+            <dd>
+              <a className="text-vault-fg underline-offset-4 hover:underline" href="mailto:privacy@cmdly.app">
+                privacy@cmdly.app
+              </a>
+            </dd>
+          </dl>
+        </section>
+
+        <section className="rounded-2xl border border-vault-border bg-vault-surface/60 p-4 backdrop-blur-xl">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-vault-muted">Disclaimer</h2>
+          <p className="mt-2 text-xs leading-relaxed text-vault-muted">{DISCLAIMER}</p>
+          <p className="mt-2 text-[11px] text-vault-subtle">
+            Reference data is illustrative — always confirm shortcuts against each vendor&apos;s current documentation.
+          </p>
+        </section>
       </div>
     </div>
   );

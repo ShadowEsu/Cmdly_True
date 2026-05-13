@@ -10,6 +10,7 @@ import { PlatformPage } from "./pages/PlatformPage";
 import { SearchPage } from "./pages/SearchPage";
 import { CollectionsPage } from "./pages/CollectionsPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { PrivacyPage } from "./pages/PrivacyPage";
 
 function Shell({ children }: { children: ReactNode }) {
   return (
@@ -34,6 +35,7 @@ export default function App() {
                   <Route path="/search" element={<SearchPage />} />
                   <Route path="/collections" element={<CollectionsPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Shell>

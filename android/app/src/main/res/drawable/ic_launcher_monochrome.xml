@@ -5,11 +5,6 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!--
-        Adaptive-icon foreground. Safe-zone is the central 72x72 region.
-        Mark: stylized terminal prompt ">_" in the brand purple/white.
-    -->
-
     <path
         android:fillColor="#FFFFFFFF"
         android:strokeColor="#FFFFFFFF"
@@ -19,8 +14,8 @@
         android:pathData="M39,42 L55,54 L39,66" />
 
     <path
-        android:fillColor="#8B5CF6"
-        android:strokeColor="#8B5CF6"
+        android:fillColor="#FFFFFFFF"
+        android:strokeColor="#FFFFFFFF"
         android:strokeLineCap="round"
         android:strokeWidth="6"
         android:pathData="M58,70 L72,70" />

@@ -81,11 +81,23 @@ fun SettingsScreen(
             )
         }
 
+        Spacer(Modifier.height(12.dp))
+        Text("About", style = MaterialTheme.typography.titleMedium)
+        Text("Cmdly · 0.1.0", style = MaterialTheme.typography.bodyMedium)
+        Text("MIT License · cmdly.app/privacy", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+        Spacer(Modifier.height(8.dp))
         Text(
-            "Play build note: replace applicationId with your final package name before publishing.",
+            "Cmdly is an independent reference tool. It is not affiliated with, endorsed by, or sponsored by Anthropic, OpenAI, Google, GitHub, Perplexity, Mistral, DeepSeek, xAI, Lovable, or any other platform listed in the app.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 12.dp),
+        )
+
+        Text(
+            "Reference data is illustrative — always confirm shortcuts against each vendor's current documentation.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 8.dp),
         )
     }
 }
